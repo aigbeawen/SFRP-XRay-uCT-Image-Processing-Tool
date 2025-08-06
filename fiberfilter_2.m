@@ -154,7 +154,7 @@ end
 %
 fs=histcounts(Ns(:),1:ns); epts(ismember(Ns,find(fs==1)))=1;npts=find(epts);
 [Fx,Fy,Fz]=ind2sub(sz,npts); PX=[Fx,Fy,Fz];
-pdx=pdist2(PX,PX,'euclidean'); ndx=size(pdx); pdx(logical(eye(ndx)))=inf;
+pdx=pdist2(PX,PX,'euclidean'); ndx=size(pdx,1); pdx(logical(eye(ndx)))=inf;
 [mpx,rdx]=min(pdx,[],2); npdx=[(1:ndx)',rdx];
 bdx=logical((mpx>sqrt(3)).*(mpx<3.)); npdx=npdx(bdx,:); 
 npdx=unique(sort(npdx,2),'rows')    ; kpts=npts(npdx); 

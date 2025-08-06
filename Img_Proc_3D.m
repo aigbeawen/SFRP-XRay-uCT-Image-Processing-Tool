@@ -96,8 +96,8 @@ fprintf('Conn. void avg. pixel diameter = %.4f pix\n',cn_davg);
 % fprintf(' Iso. void avg. Wadell sphericity = %.4f \n',nc_savg);
 % fprintf('Conn. void avg. Wadell sphericity = %.4f \n',cn_savg);
 % ----------------------- Tip Voids & interacting Tips --------------------
-[Fskel,Epts,Tips]=fiberfilter_2(MV,Fibers,fname);  
-%load(['.\Data\',fname,'.mat'],'I','E','T'); Fskel=I; Epts=E; Tips=T;
+% [Fskel,Epts,Tips]=fiberfilter_2(MV,Fibers,fname);  
+load(['.\Data\',fname,'.mat'],'I','E','T'); Fskel=I; Epts=E; Tips=T;
 Fskel=Fskel(bsz,bsz,bsz); Epts=Epts(bsz,bsz,bsz); Tips=Tips(bsz,bsz,bsz);
 % zero Epts Boundary Buffer zone 
 Etol=5; gsz=reshape(1:sz^3,sz,sz,sz); Erng=Etol+1:sz-Etol;
@@ -138,9 +138,9 @@ fpte=unique(fcnts(:)); fpte=fpte(fpte>0); wEpts=ismember(Fskel,fpte);
 % udfv=unique(pVoids(sdfv)); Rf(ismember(Voids,udfv))=2;
 % [vs,sc]=VolPlot(Rf,Qf,[],.40,.30,.70,[],{'gray','hsv'});
 % % ------------------------- Visulaization ---------------------------------
-R=zeros(sz,sz,sz); R(Epts>0)=0; R(ismember(Voids,ndfv))=2; 
-R(Void_bw & (R~=2))=3;
-[vs,sc]=VolPlot(R,Q-(Q==1),[],.40,.30,.70,[],{'gray','hsv'});
+R=zeros(sz,sz,sz); R(Epts>0)=3; R(ismember(Voids,ndfv))=4; 
+R(Void_bw & (R~=4))=1;
+[vs,sc]=VolPlot(R,Q-(Q>0),[],.40,.30,.85,[],{'bone','prism'});
 sc.CameraPosition=[375, 375, 300];
 %
 lf=50;Lf=ismember(Fibers,find(freqf<lf));
@@ -202,17 +202,17 @@ set(gcf,'Color','w');
 end
 %
 function [vs,sc]=VolPlot(R,Q,P,aQ,aR,gv,gs,cmap)
-fs=uifigure('Name','All Regions'); vs=volshow(Q,'Parent',fs);
+fs=viewer3d('Title','All Regions'); vs=volshow(Q,'Parent',fs);
 sc=vs.Parent; sc.Lighting='off'; sc.BackgroundColor='w'; sc.Box='on';
-sc.BackgroundGradient='off'; vs.Colormap=colormap(fs,cmap{1});
+sc.BackgroundGradient='off'; vs.Colormap=colormap(cmap{1});
 vs.RenderingStyle='GradientOpacity'; vs.GradientOpacityValue=gv;
 if isempty(P)
     vs.Alphamap=aQ; P=1; style='Label';
 else
     vs.AlphaData=(aQ*(P-1.)+1.); style='Volume';
 end
-vs.OverlayData=R.*P; vs.OverlayColormap=colormap(fs,cmap{2});  
-vs.OverlayRenderingStyle=[style,'Overlay']; vs.OverlayAlphamap=aR;
+vs.OverlayData=R.*P; vs.OverlayColormap=colormap(cmap{2});  
+vs.OverlayRenderingStyle=[style,'Overlay']; % vs.OverlayAlphamap=aR;
 vs.OverlayThreshold=1.e-5;
 if ~isempty(gs)
     sc.Denoising='on'; sc.DenoisingSigma =gs(1);
@@ -224,7 +224,7 @@ function ndx=zoomView(gsz,gdx,sz,Q,R)
 % gsz=5; gdx=[3,4,2];
 jsz=round(sz/gsz); jdx=jsz*((1:gsz)'-1)+(1:jsz); ndx=jdx(gdx,:);
 jx=ndx(1,:); jy=ndx(2,:); jz=ndx(3,:); Qj=Q(jx,jy,jz); Rj=R(jx,jy,jz);
-fs=uifigure('Name','Sub Region'); vs=volshow(Qj,'Parent',fs);
+fs=viewer3d('Title','Sub Regions'); vs=volshow(Qj,'Parent',fs);
 sc=vs.Parent; sc.Lighting='off';sc.BackgroundColor='w';
 sc.Box='on'; sc.BackgroundGradient='off';  vs.OverlayData=Rj; 
 vs.RenderingStyle='GradientOpacity';  vs.Colormap=gray;
@@ -252,3 +252,4 @@ for js=1:ns
     fprintf('%d of %d\n',js,ns);
 end
 end
+%
